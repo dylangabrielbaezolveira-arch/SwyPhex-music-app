@@ -1,1 +1,41 @@
+version: '3.8'
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/musicapp
+      - JWT_SECRET=your_jwt_secret_here
+    depends_on:
+      - mongodb
+      - redis
 
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  mobile:
+    build: ./mobile
+    ports:
+      - "19000:19000"
+    depends_on:
+      - backend
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  mongodb_data:
