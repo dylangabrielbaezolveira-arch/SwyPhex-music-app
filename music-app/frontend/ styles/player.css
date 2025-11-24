@@ -1,175 +1,221 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Volume2, Heart, Share2 } from 'lucide-react';
-
-interface Song {
-  _id: string;
-  title: string;
-  artist: {
-    _id: string;
-    username: string;
-    profile: {
-      displayName: string;
-    };
-  };
-  duration: number;
-  coverArt: string;
-  audioFile: string;
+.player-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #181818;
+  border-top: 1px solid #282828;
+  padding: 16px;
+  z-index: 1000;
 }
 
-interface PlayerProps {
-  currentSong: Song | null;
-  isPlaying: boolean;
-  onPlayPause: () => void;
-  onNext: () => void;
-  onPrevious: () => void;
-  onLike: (songId: string) => void;
+.player-container.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
 }
 
-const Player: React.FC<PlayerProps> = ({
-  currentSong,
-  isPlaying,
-  onPlayPause,
-  onNext,
-  onPrevious,
-  onLike
-}) => {
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [volume, setVolume] = useState(1);
-  const [isLiked, setIsLiked] = useState(false);
+.player-placeholder p {
+  color: #b3b3b3;
+  margin: 0;
+}
 
-  useEffect(() => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.play();
-      } else {
-        audioRef.current.pause();
-      }
-    }
-  }, [isPlaying, currentSong]);
+.player-content {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentTime(audioRef.current.currentTime);
-    }
-  };
+.song-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
 
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newTime = parseFloat(e.target.value);
-    setCurrentTime(newTime);
-    if (audioRef.current) {
-      audioRef.current.currentTime = newTime;
-    }
-  };
+.cover-art {
+  width: 56px;
+  height: 56px;
+  border-radius: 4px;
+  object-fit: cover;
+}
 
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-    if (audioRef.current) {
-      audioRef.current.volume = newVolume;
-    }
-  };
+.song-details {
+  min-width: 0;
+  flex: 1;
+}
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+.song-title {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-  if (!currentSong) {
-    return (
-      <div className="player-container empty">
-        <div className="player-placeholder">
-          <p>Selecciona una canción para reproducir</p>
-        </div>
-      </div>
-    );
+.artist-name {
+  color: #b3b3b3;
+  font-size: 12px;
+  margin: 4px 0 0 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.like-btn {
+  background: none;
+  border: none;
+  color: #b3b3b3;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.like-btn:hover {
+  color: #1db954;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.like-btn.liked {
+  color: #1db954;
+}
+
+.player-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.control-btn {
+  background: none;
+  border: none;
+  color: #b3b3b3;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.control-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.play-pause-btn {
+  background: #ffffff;
+  border: none;
+  color: #000000;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.play-pause-btn:hover {
+  transform: scale(1.06);
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.time-current,
+.time-total {
+  color: #b3b3b3;
+  font-size: 12px;
+  min-width: 40px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #535353;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+.progress-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.progress-bar:hover::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.volume-bar {
+  width: 100px;
+  height: 4px;
+  border-radius: 2px;
+  background: #535353;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+.volume-bar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.volume-bar:hover::-webkit-slider-thumb {
+  opacity: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .player-content {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    text-align: center;
   }
 
-  const progress = (currentTime / currentSong.duration) * 100;
+  .song-info {
+    justify-content: center;
+  }
 
-  return (
-    <div className="player-container">
-      <audio
-        ref={audioRef}
-        src={currentSong.audioFile}
-        onTimeUpdate={handleTimeUpdate}
-        onEnded={onNext}
-      />
-      
-      <div className="player-content">
-        {/* Información de la canción */}
-        <div className="song-info">
-          <img 
-            src={currentSong.coverArt || '/default-cover.jpg'} 
-            alt={currentSong.title}
-            className="cover-art"
-          />
-          <div className="song-details">
-            <h4 className="song-title">{currentSong.title}</h4>
-            <p className="artist-name">
-              {currentSong.artist.profile.displayName}
-            </p>
-          </div>
-          <button 
-            className={`like-btn ${isLiked ? 'liked' : ''}`}
-            onClick={() => {
-              setIsLiked(!isLiked);
-              onLike(currentSong._id);
-            }}
-          >
-            <Heart size={20} fill={isLiked ? 'currentColor' : 'none'} />
-          </button>
-        </div>
+  .volume-control {
+    justify-content: center;
+  }
 
-        {/* Controles principales */}
-        <div className="player-controls">
-          <button className="control-btn" onClick={onPrevious}>
-            <SkipBack size={24} />
-          </button>
-          
-          <button className="play-pause-btn" onClick={onPlayPause}>
-            {isPlaying ? <Pause size={32} /> : <Play size={32} />}
-          </button>
-          
-          <button className="control-btn" onClick={onNext}>
-            <SkipForward size={24} />
-          </button>
-        </div>
-
-        {/* Barra de progreso */}
-        <div className="progress-container">
-          <span className="time-current">{formatTime(currentTime)}</span>
-          <input
-            type="range"
-            min="0"
-            max={currentSong.duration}
-            value={currentTime}
-            onChange={handleSeek}
-            className="progress-bar"
-            style={{
-              background: `linear-gradient(to right, #1db954 0%, #1db954 ${progress}%, #535353 ${progress}%, #535353 100%)`
-            }}
-          />
-          <span className="time-total">{formatTime(currentSong.duration)}</span>
-        </div>
-
-        {/* Control de volumen */}
-        <div className="volume-control">
-          <Volume2 size={20} />
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onChange={handleVolumeChange}
-            className="volume-bar"
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default Player;
+  .progress-container {
+    order: -1;
+  }
+}
